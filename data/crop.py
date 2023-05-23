@@ -1,5 +1,7 @@
 import numpy as np
-from scipy.misc import imread
+#from scipy.misc import imread --deprecated
+from imageio import imread 
+import os
 
 CAM = 2
 
@@ -79,22 +81,31 @@ def align_img_and_pc(img_dir, pc_dir, calib_dir):
     return points
 
 # update the following directories
-IMG_ROOT = '/media/billy/New Volume/KITTI/testing/image_2/'
-PC_ROOT = '/media/billy/New Volume/KITTI/testing/velodyne/'
-CALIB_ROOT = '/media/billy/New Volume/KITTI/testing/calib/'
-PC_CROP_ROOT = '/media/billy/New Volume/KITTI/testing/crop/'
+root_path="/media/alper/DATADRIVE2/KITTI2/"
+tr_or_ts=["training", "testing"]
+force_to_file = False
 
+for tr_ts in tr_or_ts:
+    IMG_ROOT = root_path+tr_ts+'/image_2/'
+    PC_ROOT = root_path+tr_ts+'/velodyne/'
+    CALIB_ROOT = root_path+tr_ts+'/calib/'
+    PC_CROP_ROOT = root_path+tr_ts+'/crop/'
 
-for frame in range(0, 7518):
-    img_dir = IMG_ROOT + '%06d.png' % frame
-    pc_dir = PC_ROOT + '%06d.bin' % frame
-    calib_dir = CALIB_ROOT + '%06d.txt' % frame
-
-    points = align_img_and_pc(img_dir, pc_dir, calib_dir)
-    
-    output_name = PC_CROP_ROOT + '%06d.bin' % frame
-    print('Save to %s' % output_name)
-    points[:,:4].astype('float32').tofile(output_name)
+    if ~os.path.exists(PC_CROP_ROOT):
+        os.mkdir(PC_CROP_ROOT)
+        
+    for frame in range(0, 7518):
+        output_name = PC_CROP_ROOT + '%06d.bin' % frame
+        if ~os.path.exists(output_name) or force_to_file:
+            img_dir = IMG_ROOT + '%06d.png' % frame
+            pc_dir = PC_ROOT + '%06d.bin' % frame
+            calib_dir = CALIB_ROOT + '%06d.txt' % frame
+            points = align_img_and_pc(img_dir, pc_dir, calib_dir)
+            print('Save to %s' % output_name)
+            points[:,:4].astype('float32').tofile(output_name)
+        else:
+            print('File already exists: %s' % output_name)
+            
 
 
 

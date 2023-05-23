@@ -9,6 +9,8 @@ This is an unofficial implementation of [VoxelNet: End-to-End Learning for Point
 - `opencv`
 - `shapely`
 - `mayavi`
+- `imageio`
+-
 
 # Installation
 
